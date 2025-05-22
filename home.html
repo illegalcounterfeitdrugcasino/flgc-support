@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLGC Support Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827; /* Tailwind gray-900 */
+            color: #D1D5DB; /* Tailwind gray-300 */
+            display: flex;
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        #sidebar {
+            width: 280px;
+            background-color: #1F2937; /* Tailwind gray-800 */
+            padding: 20px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #374151; /* Tailwind gray-700 */
+            z-index: 100; /* Ensure sidebar is above main content if overlapping on small screens */
+        }
+        #main-content {
+            margin-left: 280px;
+            padding: 30px;
+            width: calc(100% - 280px);
+            overflow-y: auto;
+        }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            color: #9CA3AF; /* Tailwind gray-400 */
+            text-decoration: none;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .nav-link:hover, .nav-link.active {
+            background-color: #4B5563; /* Tailwind gray-600 */
+            color: #FFFFFF;
+        }
+        .nav-link i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+        .support-section {
+            display: none;
+            background-color: #1F2937; /* Tailwind gray-800 */
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .support-section.active {
+            display: block;
+        }
+        h1 {
+            font-size: 1.875rem; /* 30px */
+            font-weight: 600; /* semibold */
+            margin-bottom: 1.5rem; /* mb-6 */
+            color: #FFFFFF;
+        }
+        h2 {
+            font-size: 1.5rem; /* 24px */
+            font-weight: 600; /* semibold */
+            margin-bottom: 1rem; /* mb-4 */
+            color: #FFFFFF;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #D1D5DB; /* Tailwind gray-300 */
+        }
+        input[type="text"], input[type="email"], textarea, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            border: 1px solid #4B5563; /* Tailwind gray-600 */
+            background-color: #374151; /* Tailwind gray-700 */
+            color: #FFFFFF;
+            box-sizing: border-box;
+        }
+        input[type="text"]:focus, input[type="email"]:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #60A5FA; /* Tailwind blue-400 */
+            box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.5);
+        }
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        button[type="submit"], .btn-primary {
+            background-color: #60A5FA; /* Tailwind blue-500 */
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        button[type="submit"]:hover, .btn-primary:hover {
+            background-color: #3B82F6; /* Tailwind blue-600 */
+        }
+        button[type="submit"]:disabled {
+            background-color: #4B5563; /* Tailwind gray-600 */
+            cursor: not-allowed;
+        }
+        .faq-item {
+            background-color: #374151; /* Tailwind gray-700 */
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        .faq-question {
+            font-weight: 600;
+            color: #E5E7EB; /* Tailwind gray-200 */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .faq-answer {
+            display: none;
+            margin-top: 10px;
+            color: #D1D5DB; /* Tailwind gray-300 */
+            padding-left: 10px;
+            border-left: 2px solid #60A5FA; /* Tailwind blue-400 */
+            line-height: 1.6;
+        }
+        .faq-question i.rotate-90 {
+            transform: rotate(90deg);
+        }
+        /* Custom modal for notifications */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background-color: #1F2937; /* Tailwind gray-800 */
+            margin: auto;
+            padding: 25px;
+            border: 1px solid #4B5563; /* Tailwind gray-600 */
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        .modal-content p {
+            margin-bottom: 20px;
+            color: #D1D5DB; /* Tailwind gray-300 */
+        }
+        .modal-close-btn {
+            background-color: #60A5FA; /* Tailwind blue-500 */
+            color: white;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .modal-close-btn:hover {
+            background-color: #3B82F6; /* Tailwind blue-600 */
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #60A5FA; /* Tailwind blue-400 */
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            #sidebar {
+                width: 100%;
+                height: auto;
+                position: relative; /* Changed from fixed */
+                border-right: none;
+                border-bottom: 1px solid #374151; /* Tailwind gray-700 */
+                flex-direction: row; /* Arrange items horizontally */
+                overflow-x: auto; /* Allow horizontal scrolling for nav items */
+                padding: 10px;
+            }
+            #sidebar .text-2xl { /* Sidebar Title */
+                font-size: 1.25rem; /* Smaller title */
+                margin-bottom: 0;
+                margin-right: auto; /* Push nav links to the right */
+            }
+            #sidebar nav {
+                display: flex; /* Make nav links horizontal */
+                flex-grow: 1;
+                justify-content: flex-end;
+            }
+            .nav-link {
+                padding: 8px 10px; /* Smaller padding */
+                margin-bottom: 0; /* Remove bottom margin */
+                margin-left: 5px; /* Space between links */
+                justify-content: center;
+            }
+            .nav-link span { display: none; } /* Hide text on small screens, show only icons */
+            .nav-link i { margin-right: 0; }
+            #sidebar .mt-auto { display: none; } /* Hide footer on small screens */
+
+            #main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 20px;
+                height: auto; /* Adjust height */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar">
+        <div class="text-2xl font-bold text-white mb-8 text-center whitespace-nowrap">
+            <i class="fas fa-shield-alt mr-2"></i>FLGC Support
+        </div>
+        <nav>
+            <a href="#" class="nav-link active" data-section="general-support" title="General Support">
+                <i class="fas fa-headset"></i><span>General Support</span>
+            </a>
+            <a href="#" class="nav-link" data-section="account-support" title="Account Issues">
+                <i class="fas fa-user-cog"></i><span>Account Issues</span>
+            </a>
+            <a href="#" class="nav-link" data-section="platform-support" title="Technical Support">
+                <i class="fas fa-laptop-code"></i><span>Technical Support</span>
+            </a>
+            <a href="#" class="nav-link" data-section="bug-report" title="Report a Bug">
+                <i class="fas fa-bug"></i><span>Report a Bug</span>
+            </a>
+            <a href="#" class="nav-link" data-section="feature-request" title="Feature Request">
+                <i class="fas fa-lightbulb"></i><span>Feature Request</span>
+            </a>
+            <a href="#" class="nav-link" data-section="faq" title="FAQ">
+                <i class="fas fa-question-circle"></i><span>FAQ</span>
+            </a>
+        </nav>
+        <div class="mt-auto text-xs text-gray-500 text-center">
+            User ID: <span id="user-id-display"></span><br>
+            App ID: <span id="app-id-display"></span><br>
+            &copy; <span id="current-year"></span> Bitflash
+        </div>
+    </div>
+
+    <div id="main-content">
+        <div id="general-support" class="support-section active">
+            <h1>General Support</h1>
+            <p class="mb-6 text-gray-400">Have a general question or need to get in touch? Fill out the form below.</p>
+            <form id="general-support-form">
+                <div>
+                    <label for="gs-name">Your Name:</label>
+                    <input type="text" id="gs-name" name="name" required>
+                </div>
+                <div>
+                    <label for="gs-email">Your Email:</label>
+                    <input type="email" id="gs-email" name="email" required>
+                </div>
+                <div>
+                    <label for="gs-subject">Subject:</label>
+                    <input type="text" id="gs-subject" name="subject" required>
+                </div>
+                <div>
+                    <label for="gs-message">Message:</label>
+                    <textarea id="gs-message" name="message" required></textarea>
+                </div>
+                <button type="submit" class="btn-primary w-full sm:w-auto">
+                    <i class="fas fa-paper-plane mr-2"></i>Send Message
+                </button>
+            </form>
+        </div>
+
+        <div id="account-support" class="support-section">
+            <h1>Account Support</h1>
+            <p class="mb-6 text-gray-400">Experiencing issues with your FLGC account? Let us know.</p>
+            <form id="account-support-form">
+                <div>
+                    <label for="as-username">FLGC Account Key (if applicable):</label>
+                    <input type="text" id="as-username" name="username">
+                </div>
+                <div>
+                    <label for="as-email">Your Email:</label>
+                    <input type="email" id="as-email" name="email" required>
+                </div>
+                <div>
+                    <label for="as-issue-type">Issue Type:</label>
+                    <select id="as-issue-type" name="issueType" required>
+                        <option value="">-- Select Issue Type --</option>
+                        <option value="forgotten_key">Lost/Forgot Key</option>
+                        <option value="login_problem">Login Problem</option>
+                        <option value="data_issue">Data Discrepancy</option>
+                        <option value="account_recovery">Account Recovery</option>
+                        <option value="update_details">Update Account Details</option>
+                        <option value="deletion_request">Account Deletion Request</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="as-description">Description of Issue:</label>
+                    <textarea id="as-description" name="description" required></textarea>
+                </div>
+                <button type="submit" class="btn-primary w-full sm:w-auto">
+                    <i class="fas fa-user-shield mr-2"></i>Submit Account Ticket
+                </button>
+            </form>
+        </div>
+
+        <div id="platform-support" class="support-section">
+            <h1>Technical Support</h1>
+            <p class="mb-6 text-gray-400">Facing technical difficulties with the FLGC platform? Provide details below.</p>
+            <form id="platform-support-form">
+                <div>
+                    <label for="ps-email">Your Email:</label>
+                    <input type="email" id="ps-email" name="email" required>
+                </div>
+                <div>
+                    <label for="ps-device-info">Device Information (OS, Model):</label>
+                    <input type="text" id="ps-device-info" name="deviceInfo" placeholder="e.g., Windows 10, Dell XPS">
+                </div>
+                <div>
+                    <label for="ps-browser-info">Browser (Name, Version):</label>
+                    <input type="text" id="ps-browser-info" name="browserInfo" placeholder="e.g., Chrome 123">
+                </div>
+                <div>
+                    <label for="ps-user-agent">User Agent (auto-filled):</label>
+                    <textarea id="ps-user-agent" name="userAgent" readonly></textarea>
+                </div>
+                 <div>
+                    <label for="ps-connection-type">Internet Connection Type (if known):</label>
+                    <input type="text" id="" name="connectionType" placeholder="e.g., Wi-Fi, Ethernet, Mobile Data">
+                </div>
+                <div>
+                    <label for="ps-issue-description">Detailed Description of Technical Issue:</label>
+                    <textarea id="ps-issue-description" name="issueDescription" required></textarea>
+                </div>
+                <div>
+                    <label for="ps-steps-to-reproduce">Steps to Reproduce (if applicable):</label>
+                    <textarea id="ps-steps-to-reproduce" name="stepsToReproduce"></textarea>
+                </div>
+                <button type="submit" class="btn-primary w-full sm:w-auto">
+                    <i class="fas fa-cogs mr-2"></i>Submit Technical Ticket
+                </button>
+            </form>
+        </div>
+
+        <div id="bug-report" class="support-section">
+            <h1>Report a Bug</h1>
+            <p class="mb-6 text-gray-400">Found a bug in FLGC? Help us improve by reporting it.</p>
+            <form id="bug-report-form">
+                <div>
+                    <label for="br-email">Your Email (Optional):</label>
+                    <input type="email" id="br-email" name="email">
+                </div>
+                <div>
+                    <label for="br-area">Area of FLGC where bug occurred:</label>
+                    <input type="text" id="br-area" name="area" placeholder="e.g., Slots Game, VIP Menu" required>
+                </div>
+                <div>
+                    <label for="br-description">Bug Description:</label>
+                    <textarea id="br-description" name="description" required></textarea>
+                </div>
+                <div>
+                    <label for="br-steps">Steps to Reproduce Bug:</label>
+                    <textarea id="br-steps" name="steps" required></textarea>
+                </div>
+                <div>
+                    <label for="br-expected">Expected Behavior:</label>
+                    <textarea id="br-expected" name="expectedBehavior"></textarea>
+                </div>
+                <div>
+                    <label for="br-actual">Actual Behavior:</label>
+                    <textarea id="br-actual" name="actualBehavior"></textarea>
+                </div>
+                <button type="submit" class="btn-primary w-full sm:w-auto">
+                    <i class="fas fa-bug-slash mr-2"></i>Submit Bug Report
+                </button>
+            </form>
+        </div>
+
+        <div id="feature-request" class="support-section">
+            <h1>Suggest a Feature</h1>
+            <p class="mb-6 text-gray-400">Have an idea for a new feature or improvement for FLGC? We'd love to hear it!</p>
+            <form id="feature-request-form">
+                <div>
+                    <label for="fr-email">Your Email (Optional, for updates):</label>
+                    <input type="email" id="fr-email" name="email">
+                </div>
+                <div>
+                    <label for="fr-idea-title">Feature Idea / Title:</label>
+                    <input type="text" id="fr-idea-title" name="ideaTitle" required>
+                </div>
+                <div>
+                    <label for="fr-description">Detailed Description of Feature:</label>
+                    <textarea id="fr-description" name="description" required></textarea>
+                </div>
+                <div>
+                    <label for="fr-benefits">How would this feature benefit users?</label>
+                    <textarea id="fr-benefits" name="benefits"></textarea>
+                </div>
+                <button type="submit" class="btn-primary w-full sm:w-auto">
+                    <i class="fas fa-rocket mr-2"></i>Submit Feature Request
+                </button>
+            </form>
+        </div>
+
+        <div id="faq" class="support-section">
+            <h1>Frequently Asked Questions</h1>
+            <div id="faq-list">
+                </div>
+        </div>
+    </div>
+
+    <div id="notification-modal" class="modal">
+        <div class="modal-content">
+            <div id="modal-spinner" class="spinner" style="display: none;"></div>
+            <p id="modal-message"></p>
+            <button id="modal-close" class="modal-close-btn">OK</button>
+        </div>
+    </div>
+
+    <script type="module">
+        // Firebase Imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, getDocs, query, orderBy as firestoreOrderBy, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js"; // Optional
+
+        // --- START Firebase Configuration ---
+        // IMPORTANT: REPLACE THE PLACEHOLDER VALUES BELOW WITH YOUR ACTUAL FIREBASE PROJECT CONFIGURATION
+        const firebaseConfig = {
+    apiKey: "AIzaSyAR5ZNjlqMDSu6nTLEYrTQZrFhSODply8s",
+    authDomain: "flgcas.firebaseapp.com",
+    projectId: "flgcas",
+    storageBucket: "flgcas.firebasestorage.app",
+    messagingSenderId: "756441459947",
+    appId: "1:756441459947:web:82e6aaa245c5cea95ae2ae",
+    measurementId: "G-WT7712F2DP"
+};
+        // --- END Firebase Configuration ---
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'flgc-support-center-default';
+        
+        let db;
+        // let analytics; // Optional
+        let userId;
+
+        if (!firebaseConfig || firebaseConfig.apiKey === "YOUR_API_KEY") {
+            console.error("Firebase configuration is missing or uses placeholder values. Support center submissions will not work. Please update the firebaseConfig object in the script.");
+            showModal("Configuration Error: Unable to connect to support services. Please check the setup.");
+        } else {
+            try {
+                const firebaseApp = initializeApp(firebaseConfig);
+                db = getFirestore(firebaseApp);
+                setLogLevel('debug'); // Optional: for more detailed Firestore logs in console
+                // analytics = getAnalytics(firebaseApp); // Uncomment if you need analytics
+                console.log("Firebase initialized successfully for FLGC Support Center with project ID:", firebaseConfig.projectId);
+            } catch (e) {
+                console.error("Error initializing Firebase App:", e);
+                showModal("Initialization Error: Could not connect to support services. Details: " + e.message);
+            }
+        }
+        
+        // Generate or retrieve a unique user ID (client-side for non-authed users)
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+        userId = localStorage.getItem('flgcSupportUserId');
+        if (!userId) {
+            userId = generateUUID();
+            localStorage.setItem('flgcSupportUserId', userId);
+        }
+        // Display User ID and App ID in the sidebar footer
+        const userIdDisplay = document.getElementById('user-id-display');
+        if (userIdDisplay) userIdDisplay.textContent = userId.substring(1024,0);
+        
+        const appIdDisplay = document.getElementById('app-id-display');
+        if (appIdDisplay) appIdDisplay.textContent = appId;
+        
+        const currentYearDisplay = document.getElementById('current-year');
+        if (currentYearDisplay) currentYearDisplay.textContent = new Date().getFullYear();
+
+
+        // Prevent default form submission and dev tools
+        document.addEventListener('contextmenu', event => { 
+            // Allow context menu in input fields for copy/paste
+            if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
+                return;
+            }
+            event.preventDefault();
+        });
+        document.addEventListener('dragstart', event => event.preventDefault());
+        document.addEventListener('keydown', event => {
+            if (
+                (event.ctrlKey && event.shiftKey && (event.key.toLowerCase() === 'i' || event.key.toLowerCase() === 'c' || event.key.toLowerCase() === 'j')) || // Ctrl+Shift+I/C/J
+                (event.ctrlKey && (event.key.toLowerCase() === 's' || event.key.toLowerCase() === 'u')) || // Ctrl+S/U
+                (event.metaKey && event.altKey && event.key.toLowerCase() === 'i') || // Cmd+Option+I (Mac)
+                event.key === 'F12'
+            ) {
+                event.preventDefault();
+            }
+        });
+        
+        // Navigation Logic
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('.support-section');
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const sectionId = link.getAttribute('data-section');
+
+                navLinks.forEach(nav => nav.classList.remove('active'));
+                link.classList.add('active');
+
+                sections.forEach(section => {
+                    if (section.id === sectionId) {
+                        section.classList.add('active');
+                    } else {
+                        section.classList.remove('active');
+                    }
+                });
+
+                if (sectionId === 'faq') {
+                    loadFAQs();
+                }
+                if (sectionId === 'platform-support') {
+                    const userAgentField = document.getElementById('ps-user-agent');
+                    if(userAgentField) userAgentField.value = navigator.userAgent;
+                    
+                    const connectionTypeField = document.getElementById('ps-connection-type');
+                    if(connectionTypeField && navigator.connection) {
+                        connectionTypeField.value = navigator.connection.effectiveType || 'Unknown';
+                    }
+                }
+            });
+        });
+
+        // Modal Notification Logic
+        const modal = document.getElementById('notification-modal');
+        const modalMessage = document.getElementById('modal-message');
+        const modalCloseBtn = document.getElementById('modal-close');
+        const modalSpinner = document.getElementById('modal-spinner');
+
+        function showModal(message, isLoading = false) {
+            if (!modal || !modalMessage || !modalCloseBtn || !modalSpinner) return; // Ensure elements exist
+            modalMessage.innerHTML = message; 
+            if (isLoading) {
+                modalSpinner.style.display = 'block';
+                modalCloseBtn.style.display = 'none';
+            } else {
+                modalSpinner.style.display = 'none';
+                modalCloseBtn.style.display = 'inline-block';
+            }
+            modal.style.display = 'flex';
+        }
+        if(modalCloseBtn) {
+            modalCloseBtn.onclick = () => {
+                if(modal) modal.style.display = 'none';
+            };
+        }
+        window.onclick = (event) => {
+            if (event.target == modal) {
+                if (modalCloseBtn && modalCloseBtn.style.display !== 'none') { 
+                    if(modal) modal.style.display = 'none';
+                }
+            }
+        };
+
+        // Firestore Submission Helper
+        async function submitToFirestore(collectionName, data, formElement) {
+            if (!db) {
+                showModal("Database connection error. Cannot submit ticket. Please ensure Firebase is configured correctly.");
+                return;
+            }
+            showModal("Submitting your request...", true);
+            const submitButton = formElement.querySelector('button[type="submit"]');
+            if(submitButton) submitButton.disabled = true;
+
+            try {
+                // Corrected Firestore path structure:
+                // root_collection / specific_app_document / user_specific_collection / user_id_document / ticket_type_collection / actual_ticket_document
+                // Example: 'support_tickets' / 'flgc-app' / 'user_data' / 'user-123' / 'general_queries' / {autoId}
+                // The path for `collection()` must have an odd number of segments.
+                const basePath = `support_submissions/${appId}/user_tickets/${userId}`; // Path to the user's document or a collection under it
+                const finalCollectionPath = `${basePath}/${collectionName}`; // This is 5 segments, valid for a collection.
+                
+                console.log(`Attempting to write to Firestore collection path: ${finalCollectionPath}`);
+
+                await addDoc(collection(db, finalCollectionPath), {
+                    ...data,
+                    clientUserId: userId, 
+                    appContextId: appId, 
+                    timestamp: serverTimestamp(),
+                    status: 'new', 
+                    userAgent: navigator.userAgent 
+                });
+                showModal("Your request has been submitted successfully! We will get back to you shortly.");
+                formElement.reset();
+                // Re-populate auto-filled fields if necessary
+                if (formElement.id === 'platform-support-form') {
+                    const userAgentField = document.getElementById('ps-user-agent');
+                    if(userAgentField) userAgentField.value = navigator.userAgent;
+                }
+            } catch (error) {
+                console.error("Error submitting to Firestore: ", error);
+                showModal(`Error: Could not submit your request. Please try again. <br><small>Details: ${error.message}. Check console and Firestore rules.</small>`);
+            } finally {
+                if(submitButton) submitButton.disabled = false;
+            }
+        }
+
+        // Form Submission Handlers
+        const generalSupportForm = document.getElementById('general-support-form');
+        if(generalSupportForm) {
+            generalSupportForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const data = Object.fromEntries(formData.entries());
+                submitToFirestore('general_tickets', data, e.target);
+            });
+        }
+
+        const accountSupportForm = document.getElementById('account-support-form');
+        if(accountSupportForm) {
+            accountSupportForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const data = Object.fromEntries(formData.entries());
+                submitToFirestore('account_tickets', data, e.target);
+            });
+        }
+        
+        const platformSupportForm = document.getElementById('platform-support-form');
+        if(platformSupportForm) {
+            platformSupportForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const data = Object.fromEntries(formData.entries());
+                const userAgentField = document.getElementById('ps-user-agent');
+                if(userAgentField) data.userAgent = userAgentField.value; 
+                submitToFirestore('technical_tickets', data, e.target);
+            });
+        }
+
+        const bugReportForm = document.getElementById('bug-report-form');
+        if(bugReportForm) {
+            bugReportForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const data = Object.fromEntries(formData.entries());
+                submitToFirestore('bug_reports', data, e.target);
+            });
+        }
+
+        const featureRequestForm = document.getElementById('feature-request-form');
+        if(featureRequestForm) {
+            featureRequestForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const data = Object.fromEntries(formData.entries());
+                submitToFirestore('feature_requests', data, e.target);
+            });
+        }
+
+        // FAQ Logic
+        const hardcodedFAQs = [
+            { question: "How do I reset my FLGC password?", answer: "Currently, FLGC uses an Account Key system. If you've lost your key, please use the 'Account Recovery' option in the Account Support section." },
+            { question: "What are Bitflash Bucks?", answer: "Bitflash Bucks are the in-game currency used within FLGC for various activities and purchases." },
+            { question: "Is FLGC available on mobile?", answer: "Yes, FLGC is designed to be a progressive web app (PWA) and can be installed on most modern mobile devices." },
+            { question: "How do I become a VIP?", answer: "VIP status can be achieved through in-game progress or by purchasing VIP packages. Check the VIP menu in the game for more details." },
+            { question: "Where can I find the Terms of Service?", answer: "Our Terms of Service and Privacy Policy are available via links on the initial loading screen of the FLGC app, or you can request them through General Support." },
+            { question: "The game is lagging or crashing. What can I do?", answer: "Please ensure you have a stable internet connection and are using a modern browser. Try clearing your browser cache. If issues persist, submit a Technical Support ticket with your device and browser details." }
+        ];
+
+        async function loadFAQs() {
+            const faqListDiv = document.getElementById('faq-list');
+            if (!faqListDiv) return;
+            faqListDiv.innerHTML = '<div class="spinner"></div><p class="text-center text-gray-400">Loading FAQs...</p>'; 
+
+            let faqsToDisplay = [];
+
+            if (db) {
+                try {
+                    // Path for public FAQs. This path should be readable by anyone.
+                    const publicFaqPath = `support_public_data/${appId}/faqs`; 
+                    console.log(`Attempting to read FAQs from Firestore path: ${publicFaqPath}`);
+                    const q = query(collection(db, publicFaqPath), firestoreOrderBy('order', 'asc')); 
+                    const querySnapshot = await getDocs(q);
+                    if (!querySnapshot.empty) {
+                        querySnapshot.forEach((doc) => {
+                            faqsToDisplay.push({ id: doc.id, ...doc.data() });
+                        });
+                        console.log("FAQs loaded from Firestore:", faqsToDisplay.length);
+                    } else {
+                        console.warn("No FAQs found in Firestore, using hardcoded FAQs.");
+                        faqsToDisplay = hardcodedFAQs;
+                    }
+                } catch (error) {
+                    console.error("Error fetching FAQs from Firestore, using hardcoded FAQs:", error);
+                    faqsToDisplay = hardcodedFAQs;
+                }
+            } else {
+                 console.warn("Firestore not initialized, using hardcoded FAQs.");
+                 faqsToDisplay = hardcodedFAQs;
+            }
+            
+            faqListDiv.innerHTML = ''; 
+            if (faqsToDisplay.length === 0) {
+                faqListDiv.innerHTML = '<p class="text-gray-400">No FAQs available at the moment. Please check back later.</p>';
+                return;
+            }
+
+            faqsToDisplay.forEach(faq => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'faq-item';
+                
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'faq-question';
+                questionDiv.innerHTML = `${faq.question} <i class="fas fa-chevron-right transition-transform duration-200"></i>`;
+                
+                const answerDiv = document.createElement('div');
+                answerDiv.className = 'faq-answer';
+                answerDiv.innerHTML = faq.answer; 
+                
+                itemDiv.appendChild(questionDiv);
+                itemDiv.appendChild(answerDiv);
+                
+                itemDiv.addEventListener('click', () => {
+                    const isDisplayed = answerDiv.style.display === 'block';
+                    answerDiv.style.display = isDisplayed ? 'none' : 'block';
+                    questionDiv.querySelector('i').classList.toggle('rotate-90', !isDisplayed);
+                });
+                
+                faqListDiv.appendChild(itemDiv);
+            });
+        }
+
+        // Initial actions on DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', () => {
+            // Auto-fill User Agent if platform support is the default active tab
+            const platformSupportSection = document.getElementById('platform-support');
+            if (platformSupportSection && platformSupportSection.classList.contains('active')) {
+                 const userAgentField = document.getElementById('ps-user-agent');
+                 if(userAgentField) userAgentField.value = navigator.userAgent;
+                 
+                 const connectionTypeField = document.getElementById('ps-connection-type');
+                 if(connectionTypeField && navigator.connection) {
+                    connectionTypeField.value = navigator.connection.effectiveType || 'Unknown';
+                 }
+            }
+        });
+
+    </script>
+</body>
+</html>
