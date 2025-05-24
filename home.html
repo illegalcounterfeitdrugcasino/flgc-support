@@ -700,13 +700,25 @@
 
         // FAQ Logic
         const hardcodedFAQs = [
-            { question: "How do I reset my FLGC password?", answer: "Currently, FLGC uses an Account Key system. If you've lost your key, please use the 'Account Recovery' option in the Account Support section." },
-            { question: "What are Bitflash Bucks?", answer: "Bitflash Bucks are the in-game currency used within FLGC for various activities and purchases." },
-            { question: "Is FLGC available on mobile?", answer: "Yes, FLGC is designed to be a progressive web app (PWA) and can be installed on most modern mobile devices." },
-            { question: "How do I become a VIP?", answer: "VIP status can be achieved through in-game progress or by purchasing VIP packages. Check the VIP menu in the game for more details." },
-            { question: "Where can I find the Terms of Service?", answer: "Our Terms of Service and Privacy Policy are available via links on the initial loading screen of the FLGC app, or you can request them through General Support." },
-            { question: "The game is lagging or crashing. What can I do?", answer: "Please ensure you have a stable internet connection and are using a modern browser. Try clearing your browser cache. If issues persist, submit a Technical Support ticket with your device and browser details." }
-        ];
+    { question: "How do I reset my FLGC password?", answer: "Currently, FLGC uses an Account Key system. If you've lost your key, please use the 'Account Recovery' option in the Account Support section." },
+    { question: "What are Bitflash Bucks?", answer: "Bitflash Bucks are the in-game currency used within FLGC for various activities and purchases." },
+    { question: "Is FLGC available on mobile?", answer: "Yes, FLGC is designed to be a progressive web app (PWA) and can be installed on most modern mobile devices." },
+    { question: "How do I become a VIP?", answer: "VIP status can be achieved through in-game progress or by purchasing VIP packages. Check the VIP menu in the game for more details." },
+    { question: "Where can I find the Terms of Service?", answer: "Our Terms of Service and Privacy Policy are available via links on the initial loading screen of the FLGC app, or you can request them through General Support." },
+    { question: "The game is lagging or crashing. What can I do?", answer: "Please ensure you have a stable internet connection and are using a modern browser. Try clearing your browser cache. If issues persist, submit a Technical Support ticket with your device and browser details." },
+    { question: "How do I create an account in FLGC?", answer: "From the FLGC Account screen, select 'Create Account,' enter your Name, Location, and a secure Account Key, then submit. Save your Account Key, as it’s required for login and recovery." },
+    { question: "What happens if I continue as a Guest?", answer: "Continuing as a Guest allows you to play without an account, but your progress can't be saved, Guest mode is also used offline." },
+    { question: "What is the 256-bit recovery key used for?", answer: "The 256-bit recovery key is used to unlock FLGC if the system locks due to authentication issues." },
+    { question: "How do I play the different games in FLGC?", answer: "Choose a game from the 'Choose a Game' menu. Each game has specific controls: Slots and Prize Wheel use 'SPIN,' Plinko uses 'Drop Ball,' Blackjack offers 'Hit/Stand/Double Down,' Roulette allows 'Bet Red/Black,' and Crypto Crash involves 'Place Bet/Cash Out.'" },
+    { question: "What is the Jackpot Wheel, and how do I use it?", answer: "The Jackpot Wheel is a special feature where you can spin for up to 50,000 Bitflash Bucks. You can spin the wheel once your Jackpot Progress bar is full." },
+    { question: "How do VIP levels work, and what are the benefits?", answer: "VIP levels (1, 2, Max) offer benefits like skipping ads, auto-spin, increased win chances, and faster jackpots. Purchase them with Bitflash Bucks (1,000 for VIP 1, 10,000 for VIP 2, 100,000 for VIP Max) via the VIP Membership menu." },
+    { question: "Why am I seeing a 'Device Not Supported' message?", answer: "This means your device or browser lacks the capabilities needed for FLGC. Use a modern browser like Chrome or Firefox on a newer device, or contact support for assistance." },
+    { question: "What should I do if I see a System Crash Report?", answer: "A crash report indicates an issue like an invalid recovery key. Copy the report details and contact our Special Support at https://cdn.botpress.cloud/webchat/v2.3/shareable.html?configUrl=https://files.bpcontent.cloud/2025/04/23/16/20250423161704-XGJNS7MN.json." },
+    { question: "Can I customize game settings like win chance or Plinko multipliers?", answer: "Only users with Admin Mode access can customize settings like win chance, Plinko multipliers, or Blackjack payouts. Access requires a 256-bit recovery key and admin password." },
+    { question: "What is the Bitflash Black Market?", answer: "The Bitflash Black Market is an in-game store where you can purchase items or boosts using Bitflash Bucks. Access it from the main game screen." },
+    { question: "How do I check my spin history or jackpot progress?", answer: "Spin History and Jackpot Progress are displayed on the main game screen. Spin History shows past spins, while Jackpot Progress tracks your contribution to the jackpot pool." },
+    { question: "Is it safe to run custom JavaScript in Admin Mode?", answer: "Running custom JavaScript in Admin Mode’s Script Injector can have unintended effects. Only use trusted scripts, as unverified code may cause system issues or data loss." },
+];
 
         async function loadFAQs() {
             const faqListDiv = document.getElementById('faq-list');
